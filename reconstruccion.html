@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiebre Espontaneo</title>
+<style>
+/* Fonts */
+@font-face {
+    font-family: 'SteelfishBold';
+    src: url('css/steelfish_bold-webfont.eot');
+    src: url('css/steelfish_bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('css/steelfish_bold-webfont.woff') format('woff'),
+         url('css/steelfish_bold-webfont.ttf') format('truetype'),
+         url('css/steelfish_bold-webfont.svg#SteelfishBold') format('svg');
+    font-weight: normal; font-style: normal;
+}
+@font-face {
+    font-family: 'SteelfishRegular';
+    src: url('css/steelfish_regular-webfont.eot');
+    src: url('css/steelfish_regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('css/steelfish_regular-webfont.woff') format('woff'),
+         url('css/steelfish_regular-webfont.ttf') format('truetype'),
+         url('css/steelfish_regular-webfont.svg#SteelfishRegular') format('svg');
+    font-weight: normal; font-style: normal;
+}
+
+/* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { height: 100%; }
+
+body {
+    height: 100%;
+    background: #000;
+    color: #fff;
+    font-family: Calibri, Verdana, sans-serif;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+a { text-decoration: none; color: #fff; }
+a:hover { color: #cc6666; text-decoration: underline; }
+
+p { font-family: Calibri, Verdana, sans-serif; font-size: 14px; color: #fff; }
+
+/* ===== SLIDESHOW BG ===== */
+#supersized {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; z-index: 0;
+    overflow: hidden;
+}
+#supersized img {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+}
+#supersized img.active { opacity: 1; }
+
+/* ===== LAYOUT ===== */
+#madre {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
+    width: 100%;
+    padding-left: 30px;
+}
+
+/* Panel Izquierdo */
+#panel_izquierdo {
+    position: absolute;
+    left: 25px; top: 0;
+    width: 160px;
+    height: 100%;
+    z-index: 20;
+}
+#panel_izquierdo img.logo { margin-bottom: 40px; }
+
+#panel_izquierdo h1 {
+    font-family: SteelfishBold, Arial, sans-serif;
+    font-size: 36px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: normal;
+}
+#panel_izquierdo h2 {
+    font-family: SteelfishRegular, Arial, sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    font-weight: normal;
+    line-height: 30px;
+}
+#panel_izquierdo h2 a { color: #fff; }
+#panel_izquierdo h2 a:hover { color: #cc6666; }
+#panel_izquierdo h2 a.active-link { color: #cc6666; }
+
+/* Panel Derecho */
+#panel_derecho {
+    position: absolute;
+    top: 0; right: 80px;
+    text-align: right;
+    z-index: 20;
+}
+#panel_derecho img.conoce { margin-top: 62px; margin-bottom: 140px; }
+#panel_derecho h1 {
+    font-family: SteelfishBold, Arial, sans-serif;
+    font-size: 36px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: normal;
+}
+#panel_derecho h2 {
+    font-family: SteelfishRegular, Arial, sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    font-weight: normal;
+    line-height: 30px;
+}
+#panel_derecho h2 a { color: #fff; }
+#panel_derecho h2 a:hover { color: #cc6666; }
+#panel_derecho h2 a.active-link { color: #cc6666; }
+
+/* Redes */
+#redes {
+    position: fixed;
+    bottom: 50px; right: 0;
+    width: 30px;
+    z-index: 30;
+}
+#redes img { margin-bottom: 10px; display: block; }
+
+/* ===== CONTENIDO CENTRAL ===== */
+#contenido {
+    position: absolute;
+    left: 210px; top: 0;
+    width: 800px;
+    height: 100%;
+    overflow: hidden;
+    z-index: 15;
+}
+
+/* Páginas */
+.page {
+    display: none !important;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.page.active { display: block !important; }
+
+/* Lab tabs */
+.lab-tab { display: none; }
+.lab-tab.active { display: block; }
+
+/* --- HOME --- */
+#page-home { /* vacío, solo slideshow */ }
+
+/* --- SINOPSIS --- */
+#page-sinopsis {
+    background-image: url(pics/sinopsisbg.png);
+    background-repeat: repeat;
+    padding-top: 200px;
+    padding-left: 30px;
+    padding-right: 30px;
+    max-width: 500px;
+}
+
+/* --- TRAILER --- */
+#page-trailer.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+}
+#page-trailer iframe {
+    border: none;
+    max-width: 100%;
+}
+
+/* --- FICHA TECNICA --- */
+#page-ficha {
+    background-image: url(pics/sinopsisbg.png);
+    background-repeat: repeat;
+    padding: 65px 40px 40px 40px;
+}
+#page-ficha ul { list-style: none; }
+#page-ficha p { font-style: italic; }
+
+/* --- GALERIA --- */
+#page-galeria ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 20px;
+}
+#page-galeria ul li { margin: 0; padding: 0; line-height: 0; }
+#page-galeria ul li a img {
+    width: 160px; height: 90px;
+    transition: opacity 0.3s;
+}
+#page-galeria ul li a:hover img { opacity: 0.7; }
+
+/* --- DESCRIPCION --- */
+#page-descripcion {
+    background-image: url(pics/sinopsisbg.png);
+    background-repeat: repeat;
+    padding: 80px 25px 40px 25px;
+}
+#page-descripcion p {
+    font-style: italic;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* --- LABORATORIO --- */
+#page-laboratorio {
+    padding-top: 0;
+}
+#page-laboratorio .botones-lab {
+    display: flex;
+    height: 150px;
+    background: #fbc4ad;
+    font-family: SteelfishRegular, Arial, sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    color: #fff;
+}
+#page-laboratorio .botones-lab a {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #f7c6c8;
+    color: #fff;
+    padding: 10px;
+    transition: background 0.3s;
+    border-right: 1px solid rgba(255,255,255,0.3);
+}
+#page-laboratorio .botones-lab a:hover { background: #e5a8ab; text-decoration: none; }
+#page-laboratorio .botones-lab a.active-tab { background: #fff; color: #c6dbd2; }
+
+#page-laboratorio .lab-content {
+    background-image: url(pics/sinopsisbg.png);
+    background-repeat: repeat;
+    padding: 50px 25px;
+    min-height: 400px;
+}
+#page-laboratorio .lab-content h1 {
+    font-family: SteelfishBold, Arial, sans-serif;
+    font-size: 36px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 24px;
+}
+#page-laboratorio .lab-content p {
+    font-style: italic;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    margin-left: 25px; margin-right: 25px;
+}
+#page-laboratorio .lab-content .video-section {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+#page-laboratorio .lab-content .video-info {
+    min-width: 200px;
+}
+#page-laboratorio .lab-content .video-info p span {
+    font-family: SteelfishRegular, Arial, sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    font-style: normal;
+}
+
+/* --- PARTICIPANTES --- */
+#page-participantes {
+    background: #fff;
+    padding: 50px 25px;
+    color: #333;
+    text-align: center;
+}
+#page-participantes p { color: #666; margin-bottom: 10px; }
+#page-participantes h2 {
+    font-family: SteelfishBold, Arial, sans-serif;
+    font-size: 30px;
+    color: #f7c6c8;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+.participantes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+.participante-card {
+    background: #f7f7f7;
+    padding: 20px;
+    width: 200px;
+    text-align: center;
+    border-bottom: 3px solid #f7c6c8;
+}
+.participante-card h3 {
+    font-family: SteelfishBold, Arial, sans-serif;
+    font-size: 20px;
+    color: #333;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.participante-card p { font-size: 12px; color: #999; }
+
+/* --- CONTACTO (placeholder) --- */
+#page-contacto {
+    padding-top: 100px;
+    padding-left: 30px;
+}
+#page-contacto p { margin-bottom: 10px; }
+
+/* Lightbox overlay */
+#lightbox-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+}
+#lightbox-overlay.active { display: flex; }
+#lightbox-overlay img {
+    max-width: 90%; max-height: 90%;
+    object-fit: contain;
+}
+#lightbox-close {
+    position: absolute;
+    top: 20px; right: 30px;
+    font-size: 40px; color: #fff;
+    cursor: pointer;
+    font-family: Arial;
+}
+#lightbox-prev, #lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 50px; color: #fff;
+    cursor: pointer;
+    font-family: Arial;
+    user-select: none;
+    padding: 20px;
+}
+#lightbox-prev { left: 20px; }
+#lightbox-next { right: 20px; }
+
+/* Dark overlay for trailer */
+.cortina-negra::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Language switcher */
+#lang-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+    display: flex;
+    gap: 5px;
+}
+#lang-switcher button {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 6px 12px;
+    font-family: SteelfishBold, Arial, sans-serif;
+    font-size: 16px;
+    text-transform: uppercase;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+#lang-switcher button:hover {
+    background: rgba(255,255,255,0.2);
+}
+#lang-switcher button.active-lang {
+    background: #f7c6c8;
+    border-color: #f7c6c8;
+    color: #fff;
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDESHOW BACKGROUND -->
+<div id="supersized">
+    <img src="pics/bg/1.jpg" class="active" alt="Instalación Martin Kaulen">
+    <img src="pics/bg/2.jpg" alt="Instalación José Benmayor">
+    <img src="pics/bg/3.jpg" alt="Instalación Cristian Elizalde">
+    <img src="pics/bg/4.jpg" alt="Martin Kaulen 2">
+    <img src="pics/bg/5.jpg" alt="Montaje Laboratorio">
+    <img src="pics/bg/6.jpg" alt="Montaje Laboratorio">
+</div>
+
+<!-- LANGUAGE SWITCHER -->
+<div id="lang-switcher">
+    <button class="active-lang" onclick="setLang('es')">ES</button>
+    <button onclick="setLang('en')">EN</button>
+    <button onclick="setLang('de')">DE</button>
+</div>
+
+<!-- LAYOUT -->
+<div id="madre">
+
+    <!-- PANEL IZQUIERDO -->
+    <div id="panel_izquierdo">
+        <a href="#" onclick="goTo('home'); return false;"><img src="pics/logo.png" width="160" height="260" class="logo" alt="Logo"></a>
+        <h1 data-i18n="nav_corto">cortometraje</h1>
+        <h2><a href="#" onclick="goTo('sinopsis'); return false;" id="link-sinopsis" data-i18n="nav_sinopsis">sinopsis</a></h2>
+        <h2><a href="#" onclick="goTo('trailer'); return false;" id="link-trailer" data-i18n="nav_trailer">Mira el CORTO</a></h2>
+        <h2><a href="#" onclick="goTo('ficha'); return false;" id="link-ficha" data-i18n="nav_ficha">ficha técnica</a></h2>
+        <h2><a href="#" onclick="goTo('galeria'); return false;" id="link-galeria" data-i18n="nav_galeria">galería</a></h2>
+        <h2><a href="https://crojasu.github.io/" target="_blank" data-i18n="nav_contacto">Contacto</a></h2>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div id="contenido">
+
+        <!-- HOME (vacío) -->
+        <div class="page active" id="page-home"></div>
+
+        <!-- SINOPSIS -->
+        <div class="page" id="page-sinopsis">
+            <p data-i18n="sin_1">El cortometraje que articula el proyecto explora la idea de partir, de las migraciones contemporáneas que rompen equilibrios precarios en las vidas fragmentarias de los individuos y parte en el momento que una universitaria le comunica a su novio su idea de dejar el país.</p><br>
+            <p data-i18n="sin_2">El guión mezcla espacios de conversación en un santiago gris de invierno con los conceptos de Toshihide Maskawa, Makoto Kobayashi Y Yoichiro Nambu que proponen que el Quiebre Espontáneo En La Simetría De La Naturaleza son por un lado azarosas y por otro dan origen a nuevas formas de vida.</p><br>
+            <p data-i18n="sin_3">Sin embargo, además del planteamiento intelectual y filosófico del concepto de Quiebre Espontáneo En La Simetría De La Naturaleza en la historia también tiene lugar para los estereotipos populares sobre los que deciden partir, sobre los "patiperros", y la distancia cultural con los que vuelven.</p>
+        </div>
+
+        <!-- TRAILER -->
+        <div class="page" id="page-trailer">
+            <iframe src="https://player.vimeo.com/video/96925089" width="700" height="394" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+        </div>
+
+        <!-- FICHA TECNICA -->
+        <div class="page" id="page-ficha">
+            <ul>
+                <li><p>Titulo | Quiebre espontáneo de la simetría</p></li>
+                <li><p>Duración | 15 minutos</p></li>
+                <li><p>Soporte Técnico de registro | Digital HD</p></li>
+                <li><p>Soporte Técnico de Finalización | HD Cam</p></li>
+                <li><p>Sonido | Stéreo</p></li>
+                <li><p>Aspecto | 16:9, Color</p></li>
+                <li><p>Idioma | Español</p></li>
+                <li><p>Año | 2011</p></li>
+                <li><p>Elenco | Martín Castillo Ford y Alicia Rodríguez</p></li>
+            </ul>
+            <br>
+            <p>.....................................................................................................</p>
+            <br>
+            <p><strong>EQUIPO TÉCNICO</strong></p><br>
+            <ul>
+                <li><p>Directora — Catalina Rojas Ugarte</p></li>
+                <li><p>Producción Ejecutiva — Gabriela Sobarzo Mierzo</p></li>
+                <li><p>Guión — Ariela Navarro / Catalina Rojas</p></li>
+                <li><p>Elenco — Alicia Rodriguez, Martin Castillo, Constanza Rojas, Juval Brodsky, Francisca Riquelme, Simón Lobos</p></li>
+                <li><p>Dirección de Fotografía — Raul Heuty</p></li>
+                <li><p>Dirección de Arte — Amparo Baeza</p></li>
+                <li><p>Sonido — Alfonso Segura</p></li>
+                <li><p>Música — Alvaro Solar, Sebastian Ruiz Tagle</p></li>
+                <li><p>Montaje — Catalina Rojas</p></li>
+                <li><p>Post producción — Kine Imagen / Filmosonido</p></li>
+                <li><p>Diseño Web — Dante Alzzio Mellado, Simon Ergas, Raul Landini</p></li>
+            </ul>
+            <br>
+            <p><strong>ARTISTAS</strong></p><br>
+            <ul>
+                <li><p>Martín Kaulen – "Mi pieza"</p></li>
+                <li><p>Michael Edwards - "Muro"</p></li>
+                <li><p>Santiago Ascui – "Trabajo de actores, simetría y asimetría en la plaza"</p></li>
+                <li><p>José Benmayor – "Naturaleza"</p></li>
+                <li><p>Matías Santamaría – "Cascada"</p></li>
+            </ul>
+        </div>
+
+        <!-- GALERIA -->
+        <div class="page" id="page-galeria">
+            <ul>
+                <li><a href="#" onclick="openLightbox(0); return false;"><img src="pics/galeria/thumbs/1.jpg" width="160" height="90" alt=""></a></li>
+                <li><a href="#" onclick="openLightbox(1); return false;"><img src="pics/galeria/thumbs/2.jpg" width="160" height="90" alt=""></a></li>
+                <li><a href="#" onclick="openLightbox(2); return false;"><img src="pics/galeria/thumbs/4.jpg" width="160" height="90" alt=""></a></li>
+                <li><a href="#" onclick="openLightbox(3); return false;"><img src="pics/galeria/thumbs/6.jpg" width="160" height="90" alt=""></a></li>
+                <li><a href="#" onclick="openLightbox(4); return false;"><img src="pics/galeria/thumbs/8.jpg" width="160" height="90" alt=""></a></li>
+                <li><a href="#" onclick="openLightbox(5); return false;"><img src="pics/galeria/thumbs/9.jpg" width="160" height="90" alt=""></a></li>
+                <li><a href="#" onclick="openLightbox(6); return false;"><img src="pics/galeria/thumbs/10.jpg" width="160" height="90" alt=""></a></li>
+                <li><a href="#" onclick="openLightbox(7); return false;"><img src="pics/galeria/thumbs/11.jpg" width="160" height="90" alt=""></a></li>
+            </ul>
+        </div>
+
+        <!-- DESCRIPCION -->
+        <div class="page" id="page-descripcion">
+            <p data-i18n="desc_1">El arte como representación ha permitido a lo largo del tiempo dejar un registro de acontecimientos históricos que han marcado a la humanidad y su forma de concebir el mundo.</p>
+            <p data-i18n="desc_2">El 2008 dos físicos Japoneses Makoto Kobayashi y Toshihide Maskawa descubrieron que el origen de la vida se debe a un quiebre espontáneo de la simetría en la naturaleza. Dentro de la academia de la física, este descubrimiento causó un revuelo enorme, obteniendo un premio Nobel. Pero para el resto del mundo, el concepto pasa inadvertido. ¿cómo entenderlo? ¿Qué significa? ¿Qué repercusiones tiene en nuestra vida cotidiana? ¿Cómo se ve?</p>
+            <p data-i18n="desc_3">Este vacío es una de las motivaciones que da origen al proyecto.</p>
+            <p data-i18n="desc_4">Con el objetivo de encontrar múltiples interpretaciones visuales y perceptivas a través del arte, se invitó a diez artistas emergentes chilenos, pintores, fotógrafos y músicos a participar en diferentes conferencias con especialistas de las ciencias físicas, matemáticas y naturales con el objetivo de realizar obras de arte en diferentes formatos, que lograron expresar o representar el concepto físico titulado "Quiebre espontáneo de la simetría en la Naturaleza".</p>
+            <p data-i18n="desc_5">Estas obras luego fueron parte de la narrativa audiovisual del cortometraje QUIEBRE ESPONTANEO, convirtiéndose en ventanas visuales de un complejo concepto científico.</p>
+            <p data-i18n="desc_6">En las siguientes secciones dejamos el registro de lo que fue el laboratorio, los artistas y científicos que participaron, las charlas que realizaron.</p>
+            <p data-i18n="desc_7">Las obras finales se pueden contemplar dentro del cortometraje.</p>
+            <p data-i18n="desc_8">Que disfruten!</p>
+        </div>
+
+        <!-- LABORATORIO -->
+        <div class="page" id="page-laboratorio">
+            <div class="botones-lab">
+                <a href="#" onclick="showLabTab('intro'); return false;" class="active-tab" id="tab-intro">Laboratorio</a>
+                <a href="#" onclick="showLabTab('teoria'); return false;" id="tab-teoria">Teoría Del Quiebre Espontaneo</a>
+                <a href="#" onclick="showLabTab('biologia'); return false;" id="tab-biologia">Biología</a>
+                <a href="#" onclick="showLabTab('matematica'); return false;" id="tab-matematica">Matemática</a>
+            </div>
+
+            <!-- Lab Intro -->
+            <div class="lab-content lab-tab active" id="lab-intro">
+                <h1 data-i18n="lab_click">Haz click arriba para ver las conferencias</h1>
+                <p data-i18n="lab_intro_1">Aquí encontraras las charlas realizadas por los científicos a los participantes.</p>
+                <p data-i18n="lab_intro_2">Teoria del Quiebre Espontáneo en la Simetría de la Naturaleza, realizada por el Profesor Rodrigo Soto.</p>
+                <p data-i18n="lab_intro_3">Simetría en La Naturaleza, realizada por la Doctora Isidora Insunza.</p>
+                <p data-i18n="lab_intro_4">Caos y Simetría en Matemáticas, realizada por el Prof. Cristobal Rivas.</p>
+            </div>
+
+            <!-- Teoria -->
+            <div class="lab-content lab-tab" id="lab-teoria">
+                <div class="video-section">
+                    <div class="video-info">
+                        <p><span>2 de mayo 2011</span></p>
+                        <p><span>Teoría del quiebre espontáneo</span></p>
+                        <p>Conferencista / Rodrigo Soto</p><br>
+                        <p>Doctor en física Universidad de Chile.</p>
+                    </div>
+                    <div>
+                        <iframe src="https://player.vimeo.com/video/25979854?title=0&byline=0&portrait=0" width="400" height="300" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biologia -->
+            <div class="lab-content lab-tab" id="lab-biologia">
+                <div class="video-section">
+                    <div class="video-info">
+                        <p><span>9 de Mayo 2011</span></p>
+                        <p><span>Biología</span></p>
+                        <p>Conferencista / Isidora Insunza</p><br>
+                        <p>Bióloga Universidad de Chile</p>
+                    </div>
+                    <div>
+                        <iframe src="https://player.vimeo.com/video/24613511?title=0&byline=0&portrait=0" width="400" height="300" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matematica -->
+            <div class="lab-content lab-tab" id="lab-matematica">
+                <div class="video-section">
+                    <div class="video-info">
+                        <p><span>9 de Mayo 2011</span></p>
+                        <p><span>Matemática</span></p>
+                        <p>Conferencista / Cristobal Rivas</p><br>
+                        <p>Doctor en matemáticas Universidad de Chile</p>
+                    </div>
+                    <div>
+                        <iframe src="https://player.vimeo.com/video/24994164" width="400" height="300" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PARTICIPANTES -->
+        <div class="page" id="page-participantes">
+            <h2 data-i18n="part_title">Participantes del Laboratorio</h2>
+            <p style="color:#999;" data-i18n="part_sub">Artistas emergentes chilenos que participaron en el laboratorio</p>
+            <div class="participantes-grid">
+                <div class="participante-card"><h3>José Benmayor</h3><p>Artista — "Naturaleza"</p></div>
+                <div class="participante-card"><h3>Santiago Ascui</h3><p>Artista — "Simetría y asimetría en la plaza"</p></div>
+                <div class="participante-card"><h3>Martín Kaulen</h3><p>Artista — "Mi pieza"</p></div>
+                <div class="participante-card"><h3>Cristián Elizalde</h3><p>Artista</p></div>
+                <div class="participante-card"><h3>Michael Edwards</h3><p>Artista — "Muro"</p></div>
+                <div class="participante-card"><h3>Matías Santa María</h3><p>Artista — "Cascada"</p></div>
+            </div>
+            <br>
+            <h2 style="margin-top:30px;" data-i18n="part_scientists">Científicos</h2>
+            <div class="participantes-grid">
+                <div class="participante-card"><h3>Rodrigo Soto</h3><p>Doctor en Física, U. de Chile</p></div>
+                <div class="participante-card"><h3>Isidora Insunza</h3><p>Bióloga, U. de Chile</p></div>
+                <div class="participante-card"><h3>Cristóbal Rivas</h3><p>Doctor en Matemáticas, U. de Chile</p></div>
+            </div>
+        </div>
+
+    </div>
+    <!-- FIN CONTENIDO -->
+
+    <!-- PANEL DERECHO -->
+    <div id="panel_derecho">
+        <a href="https://issuu.com/rojas.catalina/docs/dossier" target="_blank"><img src="pics/conoce.png" width="104" height="105" class="conoce" alt="Conoce el proyecto"></a>
+        <h1 data-i18n="nav_lab">laboratorio</h1>
+        <h2><a href="#" onclick="goTo('descripcion'); return false;" id="link-descripcion" data-i18n="nav_desc">descripción</a></h2>
+        <h2><a href="#" onclick="goTo('participantes'); return false;" id="link-participantes" data-i18n="nav_particip">participantes</a></h2>
+        <h2><a href="#" onclick="goTo('laboratorio'); return false;" id="link-laboratorio" data-i18n="nav_laboratorio">laboratorio</a></h2>
+    </div>
+
+    <!-- REDES -->
+    <div id="redes">
+        <a href="https://www.facebook.com/pages/Quiebre-espont%C3%A1neo-en-la-simetr%C3%ADa/143306135749095" target="_blank"><img src="pics/fbsideico.png" width="30" height="30" alt="Facebook"></a>
+        <img src="pics/twittersideico.png" width="30" height="30" alt="Twitter">
+    </div>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox-overlay" onclick="closeLightbox()">
+    <span id="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <span id="lightbox-prev" onclick="event.stopPropagation(); navigateLightbox(-1)">&#10094;</span>
+    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+    <span id="lightbox-next" onclick="event.stopPropagation(); navigateLightbox(1)">&#10095;</span>
+</div>
+
+<script>
+// ===== SLIDESHOW =====
+(function() {
+    var imgs = document.querySelectorAll('#supersized img');
+    var current = 0;
+    setInterval(function() {
+        imgs[current].classList.remove('active');
+        current = (current + 1) % imgs.length;
+        imgs[current].classList.add('active');
+    }, 5000);
+})();
+
+// ===== NAVIGATION =====
+function goTo(page) {
+    // Hide all pages
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+
+    // Show target page
+    var target = document.getElementById('page-' + page);
+    if (target) target.classList.add('active');
+
+    // Update active links
+    var allLinks = document.querySelectorAll('#panel_izquierdo a, #panel_derecho a');
+    for (var i = 0; i < allLinks.length; i++) allLinks[i].classList.remove('active-link');
+    var activeLink = document.getElementById('link-' + page);
+    if (activeLink) activeLink.classList.add('active-link');
+
+    // Dark overlay for trailer
+    var bg = document.getElementById('supersized');
+    if (page === 'trailer') {
+        bg.style.filter = 'brightness(0.3)';
+    } else {
+        bg.style.filter = '';
+    }
+}
+
+// ===== LAB TABS =====
+function showLabTab(tab) {
+    var tabs = document.querySelectorAll('.lab-tab');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+    document.getElementById('lab-' + tab).classList.add('active');
+
+    var btns = document.querySelectorAll('.botones-lab a');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active-tab');
+    document.getElementById('tab-' + tab).classList.add('active-tab');
+}
+
+// ===== TRANSLATIONS =====
+var translations = {
+    es: {
+        nav_corto: 'cortometraje', nav_sinopsis: 'sinopsis', nav_trailer: 'Mira el CORTO',
+        nav_ficha: 'ficha técnica', nav_galeria: 'galería', nav_contacto: 'Contacto',
+        nav_lab: 'laboratorio', nav_desc: 'descripción', nav_particip: 'participantes', nav_laboratorio: 'laboratorio',
+        sin_1: 'El cortometraje que articula el proyecto explora la idea de partir, de las migraciones contemporáneas que rompen equilibrios precarios en las vidas fragmentarias de los individuos y parte en el momento que una universitaria le comunica a su novio su idea de dejar el país.',
+        sin_2: 'El guión mezcla espacios de conversación en un santiago gris de invierno con los conceptos de Toshihide Maskawa, Makoto Kobayashi Y Yoichiro Nambu que proponen que el Quiebre Espontáneo En La Simetría De La Naturaleza son por un lado azarosas y por otro dan origen a nuevas formas de vida.',
+        sin_3: 'Sin embargo, además del planteamiento intelectual y filosófico del concepto de Quiebre Espontáneo En La Simetría De La Naturaleza en la historia también tiene lugar para los estereotipos populares sobre los que deciden partir, sobre los "patiperros", y la distancia cultural con los que vuelven.',
+        desc_1: 'El arte como representación ha permitido a lo largo del tiempo dejar un registro de acontecimientos históricos que han marcado a la humanidad y su forma de concebir el mundo.',
+        desc_2: 'El 2008 dos físicos Japoneses Makoto Kobayashi y Toshihide Maskawa descubrieron que el origen de la vida se debe a un quiebre espontáneo de la simetría en la naturaleza. Dentro de la academia de la física, este descubrimiento causó un revuelo enorme, obteniendo un premio Nobel. Pero para el resto del mundo, el concepto pasa inadvertido. ¿cómo entenderlo? ¿Qué significa? ¿Qué repercusiones tiene en nuestra vida cotidiana? ¿Cómo se ve?',
+        desc_3: 'Este vacío es una de las motivaciones que da origen al proyecto.',
+        desc_4: 'Con el objetivo de encontrar múltiples interpretaciones visuales y perceptivas a través del arte, se invitó a diez artistas emergentes chilenos, pintores, fotógrafos y músicos a participar en diferentes conferencias con especialistas de las ciencias físicas, matemáticas y naturales con el objetivo de realizar obras de arte en diferentes formatos, que lograron expresar o representar el concepto físico titulado "Quiebre espontáneo de la simetría en la Naturaleza".',
+        desc_5: 'Estas obras luego fueron parte de la narrativa audiovisual del cortometraje QUIEBRE ESPONTANEO, convirtiéndose en ventanas visuales de un complejo concepto científico.',
+        desc_6: 'En las siguientes secciones dejamos el registro de lo que fue el laboratorio, los artistas y científicos que participaron, las charlas que realizaron.',
+        desc_7: 'Las obras finales se pueden contemplar dentro del cortometraje.',
+        desc_8: 'Que disfruten!',
+        lab_click: 'Haz click arriba para ver las conferencias',
+        lab_intro_1: 'Aquí encontraras las charlas realizadas por los científicos a los participantes.',
+        lab_intro_2: 'Teoria del Quiebre Espontáneo en la Simetría de la Naturaleza, realizada por el Profesor Rodrigo Soto.',
+        lab_intro_3: 'Simetría en La Naturaleza, realizada por la Doctora Isidora Insunza.',
+        lab_intro_4: 'Caos y Simetría en Matemáticas, realizada por el Prof. Cristobal Rivas.',
+        part_title: 'Participantes del Laboratorio',
+        part_sub: 'Artistas emergentes chilenos que participaron en el laboratorio',
+        part_scientists: 'Científicos'
+    },
+    en: {
+        nav_corto: 'short film', nav_sinopsis: 'synopsis', nav_trailer: 'Watch the FILM',
+        nav_ficha: 'technical sheet', nav_galeria: 'gallery', nav_contacto: 'Contact',
+        nav_lab: 'laboratory', nav_desc: 'description', nav_particip: 'participants', nav_laboratorio: 'laboratory',
+        sin_1: 'The short film that articulates the project explores the idea of leaving, of contemporary migrations that break precarious balances in the fragmentary lives of individuals, starting at the moment a university student tells her boyfriend about her idea of leaving the country.',
+        sin_2: 'The script mixes conversation spaces in a grey winter Santiago with the concepts of Toshihide Maskawa, Makoto Kobayashi and Yoichiro Nambu, who propose that the Spontaneous Symmetry Breaking in Nature is on one hand random and on the other gives rise to new forms of life.',
+        sin_3: 'However, beyond the intellectual and philosophical approach to the concept of Spontaneous Symmetry Breaking in Nature, the story also makes room for popular stereotypes about those who decide to leave, about wanderers, and the cultural distance with those who return.',
+        desc_1: 'Art as representation has allowed throughout time to leave a record of historical events that have marked humanity and its way of conceiving the world.',
+        desc_2: 'In 2008, two Japanese physicists Makoto Kobayashi and Toshihide Maskawa discovered that the origin of life is due to a spontaneous symmetry breaking in nature. Within the physics academy, this discovery caused enormous excitement, earning a Nobel Prize. But for the rest of the world, the concept goes unnoticed. How to understand it? What does it mean? What repercussions does it have on our daily lives? What does it look like?',
+        desc_3: 'This void is one of the motivations that gives rise to the project.',
+        desc_4: 'With the aim of finding multiple visual and perceptive interpretations through art, ten emerging Chilean artists, painters, photographers and musicians were invited to participate in different conferences with specialists in physics, mathematics and natural sciences, with the goal of creating artworks in different formats that managed to express or represent the physical concept titled "Spontaneous Symmetry Breaking in Nature".',
+        desc_5: 'These works later became part of the audiovisual narrative of the short film SPONTANEOUS BREAKING, becoming visual windows into a complex scientific concept.',
+        desc_6: 'In the following sections we leave the record of what the laboratory was, the artists and scientists who participated, and the talks they gave.',
+        desc_7: 'The final works can be seen within the short film.',
+        desc_8: 'Enjoy!',
+        lab_click: 'Click above to see the lectures',
+        lab_intro_1: 'Here you will find the talks given by scientists to the participants.',
+        lab_intro_2: 'Theory of Spontaneous Symmetry Breaking in Nature, by Professor Rodrigo Soto.',
+        lab_intro_3: 'Symmetry in Nature, by Dr. Isidora Insunza.',
+        lab_intro_4: 'Chaos and Symmetry in Mathematics, by Prof. Cristobal Rivas.',
+        part_title: 'Laboratory Participants',
+        part_sub: 'Emerging Chilean artists who participated in the laboratory',
+        part_scientists: 'Scientists'
+    },
+    de: {
+        nav_corto: 'Kurzfilm', nav_sinopsis: 'Synopsis', nav_trailer: 'Film ANSEHEN',
+        nav_ficha: 'Technisches Datenblatt', nav_galeria: 'Galerie', nav_contacto: 'Kontakt',
+        nav_lab: 'Labor', nav_desc: 'Beschreibung', nav_particip: 'Teilnehmer', nav_laboratorio: 'Labor',
+        sin_1: 'Der Kurzfilm, der das Projekt zusammenfasst, erforscht die Idee des Aufbruchs, der zeitgenössischen Migrationen, die prekäre Gleichgewichte im fragmentarischen Leben der Individuen brechen, und beginnt in dem Moment, in dem eine Studentin ihrem Freund ihre Idee mitteilt, das Land zu verlassen.',
+        sin_2: 'Das Drehbuch mischt Gesprächsräume in einem grauen Winter-Santiago mit den Konzepten von Toshihide Maskawa, Makoto Kobayashi und Yoichiro Nambu, die vorschlagen, dass der Spontane Symmetriebruch in der Natur einerseits zufällig ist und andererseits neue Lebensformen hervorbringt.',
+        sin_3: 'Über den intellektuellen und philosophischen Ansatz des Konzepts des Spontanen Symmetriebruchs in der Natur hinaus bietet die Geschichte auch Raum für populäre Stereotypen über diejenigen, die sich entscheiden zu gehen, über Wanderer und die kulturelle Distanz zu denen, die zurückkehren.',
+        desc_1: 'Kunst als Darstellung hat es im Laufe der Zeit ermöglicht, ein Zeugnis historischer Ereignisse zu hinterlassen, die die Menschheit und ihre Art, die Welt zu begreifen, geprägt haben.',
+        desc_2: 'Im Jahr 2008 entdeckten zwei japanische Physiker, Makoto Kobayashi und Toshihide Maskawa, dass der Ursprung des Lebens auf einen spontanen Symmetriebruch in der Natur zurückzuführen ist. In der Physik-Akademie sorgte diese Entdeckung für enormes Aufsehen und wurde mit dem Nobelpreis ausgezeichnet. Aber für den Rest der Welt bleibt das Konzept unbemerkt. Wie kann man es verstehen? Was bedeutet es? Welche Auswirkungen hat es auf unser tägliches Leben? Wie sieht es aus?',
+        desc_3: 'Diese Leere ist eine der Motivationen, die das Projekt entstehen lässt.',
+        desc_4: 'Mit dem Ziel, durch die Kunst vielfältige visuelle und wahrnehmbare Interpretationen zu finden, wurden zehn aufstrebende chilenische Künstler, Maler, Fotografen und Musiker eingeladen, an verschiedenen Konferenzen mit Spezialisten der Physik, Mathematik und Naturwissenschaften teilzunehmen, um Kunstwerke in verschiedenen Formaten zu schaffen, die das physikalische Konzept "Spontaner Symmetriebruch in der Natur" ausdrücken oder darstellen.',
+        desc_5: 'Diese Werke wurden später Teil der audiovisuellen Erzählung des Kurzfilms SPONTANER BRUCH und verwandelten sich in visuelle Fenster zu einem komplexen wissenschaftlichen Konzept.',
+        desc_6: 'In den folgenden Abschnitten hinterlassen wir das Protokoll dessen, was das Labor war, der Künstler und Wissenschaftler, die teilgenommen haben, und der Vorträge, die sie gehalten haben.',
+        desc_7: 'Die fertigen Werke können im Kurzfilm betrachtet werden.',
+        desc_8: 'Viel Vergnügen!',
+        lab_click: 'Klicken Sie oben, um die Vorträge zu sehen',
+        lab_intro_1: 'Hier finden Sie die Vorträge der Wissenschaftler an die Teilnehmer.',
+        lab_intro_2: 'Theorie des Spontanen Symmetriebruchs in der Natur, von Professor Rodrigo Soto.',
+        lab_intro_3: 'Symmetrie in der Natur, von Dr. Isidora Insunza.',
+        lab_intro_4: 'Chaos und Symmetrie in der Mathematik, von Prof. Cristobal Rivas.',
+        part_title: 'Laborteilnehmer',
+        part_sub: 'Aufstrebende chilenische Künstler, die am Labor teilgenommen haben',
+        part_scientists: 'Wissenschaftler'
+    }
+};
+
+function setLang(lang) {
+    // Update buttons
+    var btns = document.querySelectorAll('#lang-switcher button');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active-lang');
+    document.querySelector('#lang-switcher button[onclick="setLang(\'' + lang + '\')"]').classList.add('active-lang');
+
+    // Apply translations
+    var t = translations[lang];
+    var els = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < els.length; i++) {
+        var key = els[i].getAttribute('data-i18n');
+        if (t[key]) els[i].textContent = t[key];
+    }
+}
+
+// ===== LIGHTBOX =====
+var galleryImages = [
+    'pics/galeria/fullscreen/1.jpg',
+    'pics/galeria/fullscreen/2.jpg',
+    'pics/galeria/fullscreen/4.jpg',
+    'pics/galeria/fullscreen/6.jpg',
+    'pics/galeria/fullscreen/8.jpg',
+    'pics/galeria/fullscreen/9.jpg',
+    'pics/galeria/fullscreen/10.jpg',
+    'pics/galeria/fullscreen/11.jpg'
+];
+var currentLightbox = 0;
+
+function openLightbox(index) {
+    currentLightbox = index;
+    document.getElementById('lightbox-img').src = galleryImages[index];
+    document.getElementById('lightbox-overlay').classList.add('active');
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox-overlay').classList.remove('active');
+}
+
+function navigateLightbox(dir) {
+    currentLightbox = (currentLightbox + dir + galleryImages.length) % galleryImages.length;
+    document.getElementById('lightbox-img').src = galleryImages[currentLightbox];
+}
+
+// Keyboard nav
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById('lightbox-overlay').classList.contains('active')) {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') navigateLightbox(-1);
+        if (e.key === 'ArrowRight') navigateLightbox(1);
+    }
+});
+</script>
+
+</body>
+</html>
