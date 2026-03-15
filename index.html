@@ -372,20 +372,17 @@ p { font-family: Calibri, Verdana, sans-serif; font-size: 14px; color: #fff; }
 
 /* Language switcher */
 #lang-switcher {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 50;
     display: flex;
     gap: 5px;
+    margin-top: 15px;
 }
 #lang-switcher button {
     background: rgba(0,0,0,0.5);
     color: #fff;
     border: 1px solid rgba(255,255,255,0.3);
-    padding: 6px 12px;
+    padding: 4px 10px;
     font-family: SteelfishBold, Arial, sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     text-transform: uppercase;
     cursor: pointer;
     letter-spacing: 1px;
@@ -510,7 +507,6 @@ p { font-family: Calibri, Verdana, sans-serif; font-size: 14px; color: #fff; }
     #page-galeria ul li a img { width: 120px; height: 68px; }
 
     #redes { bottom: 10px; }
-    #lang-switcher { top: auto; bottom: 10px; right: 50px; }
 }
 
 /* ===== RESPONSIVE - MOBILE (<=768px) ===== */
@@ -551,8 +547,7 @@ p { font-family: Calibri, Verdana, sans-serif; font-size: 14px; color: #fff; }
     .participante-card h3 { font-size: 16px; }
 
     #redes { display: none; }
-    #lang-switcher { top: 15px; right: auto; left: 70px; bottom: auto; }
-    #lang-switcher button { padding: 4px 8px; font-size: 14px; }
+    #lang-switcher { display: none; }
 }
 
 /* ===== RESPONSIVE - SMALL MOBILE (<=480px) ===== */
@@ -578,13 +573,6 @@ p { font-family: Calibri, Verdana, sans-serif; font-size: 14px; color: #fff; }
     <img src="pics/bg/6.jpg" alt="Montaje Laboratorio">
 </div>
 
-<!-- LANGUAGE SWITCHER -->
-<div id="lang-switcher">
-    <button class="active-lang" onclick="setLang('es')">ES</button>
-    <button onclick="setLang('en')">EN</button>
-    <button onclick="setLang('de')">DE</button>
-</div>
-
 <!-- HAMBURGER BUTTON (mobile only) -->
 <button id="menu-toggle" onclick="toggleMobileNav()">&#9776;</button>
 
@@ -600,6 +588,12 @@ p { font-family: Calibri, Verdana, sans-serif; font-size: 14px; color: #fff; }
     <a href="#" onclick="mobileGoTo('descripcion')" data-i18n="nav_desc">descripción</a>
     <a href="#" onclick="mobileGoTo('participantes')" data-i18n="nav_particip">participantes</a>
     <a href="#" onclick="mobileGoTo('laboratorio')" data-i18n="nav_laboratorio">laboratorio</a>
+    <div class="nav-divider"></div>
+    <div id="lang-switcher-mobile" style="display:flex; gap:10px;">
+        <button class="active-lang" onclick="setLang('es')" style="background:rgba(0,0,0,0.5);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:6px 14px;font-family:SteelfishBold,Arial,sans-serif;font-size:18px;text-transform:uppercase;cursor:pointer;">ES</button>
+        <button onclick="setLang('en')" style="background:rgba(0,0,0,0.5);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:6px 14px;font-family:SteelfishBold,Arial,sans-serif;font-size:18px;text-transform:uppercase;cursor:pointer;">EN</button>
+        <button onclick="setLang('de')" style="background:rgba(0,0,0,0.5);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:6px 14px;font-family:SteelfishBold,Arial,sans-serif;font-size:18px;text-transform:uppercase;cursor:pointer;">DE</button>
+    </div>
 </div>
 
 <!-- LAYOUT -->
@@ -614,6 +608,11 @@ p { font-family: Calibri, Verdana, sans-serif; font-size: 14px; color: #fff; }
         <h2><a href="#" onclick="goTo('ficha'); return false;" id="link-ficha" data-i18n="nav_ficha">ficha técnica</a></h2>
         <h2><a href="#" onclick="goTo('galeria'); return false;" id="link-galeria" data-i18n="nav_galeria">galería</a></h2>
         <h2><a href="https://crojasu.github.io/" target="_blank" data-i18n="nav_contacto">Contacto</a></h2>
+        <div id="lang-switcher">
+            <button class="active-lang" onclick="setLang('es')">ES</button>
+            <button onclick="setLang('en')">EN</button>
+            <button onclick="setLang('de')">DE</button>
+        </div>
     </div>
 
     <!-- CONTENIDO -->
@@ -939,10 +938,18 @@ var translations = {
 };
 
 function setLang(lang) {
-    // Update buttons
-    var btns = document.querySelectorAll('#lang-switcher button');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active-lang');
-    document.querySelector('#lang-switcher button[onclick="setLang(\'' + lang + '\')"]').classList.add('active-lang');
+    // Update buttons (both desktop and mobile)
+    var allBtns = document.querySelectorAll('#lang-switcher button, #lang-switcher-mobile button');
+    for (var i = 0; i < allBtns.length; i++) {
+        allBtns[i].classList.remove('active-lang');
+        allBtns[i].style.background = 'rgba(0,0,0,0.5)';
+        allBtns[i].style.borderColor = 'rgba(255,255,255,0.3)';
+        if (allBtns[i].textContent === lang.toUpperCase()) {
+            allBtns[i].classList.add('active-lang');
+            allBtns[i].style.background = '#f7c6c8';
+            allBtns[i].style.borderColor = '#f7c6c8';
+        }
+    }
 
     // Apply translations
     var t = translations[lang];
